@@ -1,63 +1,65 @@
-Eigenvector Spatial Filters Nuclear Norm Matrix Completion
+# Eigenvector Spatial Filters Nuclear Norm Matrix Completion
 
 This repository contains the R code accompanying the paper:
 
-Eigenvector Spatial Filters Nuclear Norm Matrix Completion with Application to Air Quality Data
+**Eigenvector Spatial Filters Nuclear Norm Matrix Completion with Application to Air Quality Data**
 
 The repository provides implementations of:
 
-FENNMC — Fixed Effects Nuclear Norm Matrix Completion, used as the main benchmark;
-ESFNNMC — Eigenvector Spatial Filters Nuclear Norm Matrix Completion, the spatial extension proposed in the paper.
+- **FENNMC** — Fixed Effects Nuclear Norm Matrix Completion, used as the main benchmark;
+- **ESFNNMC** — Eigenvector Spatial Filters Nuclear Norm Matrix Completion, the spatial extension proposed in the paper.
 
 ESFNNMC extends fixed-effects nuclear norm matrix completion by replacing unrestricted unit fixed effects with a parsimonious representation based on Moran eigenvectors derived from a spatial weights matrix.
 
 The repository also contains reproducible examples illustrating how the methods can be used to reconstruct missing entries in partially observed panel and spatio-temporal matrices.
 
-Model overview
+## Model overview
 
 Let
 
-[
+\[
 M \in \mathbb{R}^{n \times T}
-]
+\]
 
 be a partially observed matrix.
 
 The FENNMC estimator decomposes the matrix as
 
-[
+\[
 M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E,
-]
+\]
 
 where:
 
-(L) is a low-rank latent component;
-(u) contains unit fixed effects;
-(v) contains time fixed effects;
-(E) is the residual component.
+- \(L\) is a low-rank latent component;
+- \(u\) contains unit fixed effects;
+- \(v\) contains time fixed effects;
+- \(E\) is the residual component.
 
 The estimator solves
 
-[
+\[
 \min_{L,u,v}
 \frac{1}{2}
 \sum_{(i,t)\in\Omega}
 (M_{it}-L_{it}-u_i-v_t)^2
 +
-\lambda |L|_*,
-]
+\lambda \|L\|_*,
+\]
 
-where (|L|_*) denotes the nuclear norm.
+where \(\|L\|_*\) denotes the nuclear norm.
 
 Estimation is performed through a block-coordinate descent algorithm alternating between:
 
-unit fixed effects;
-time fixed effects;
-the low-rank component, updated through singular-value soft thresholding.
+1. unit fixed effects;
+2. time fixed effects;
+3. the low-rank component, updated through singular-value soft thresholding.
 
-The regularization parameter (\lambda) can be selected by cross-validation.
+The regularization parameter \(\lambda\) can be selected by cross-validation.
 
-Repository structure
+## Repository structure
+
+```text
 .
 ├── README.md
 ├── R/
@@ -68,27 +70,35 @@ Repository structure
 │   └── toy_ESFNNMC.R
 └── application/
     └── ...
+```
 
 The repository will be progressively updated with the code required to reproduce the simulation study and the empirical application presented in the paper.
 
-FENNMC in R
+# FENNMC in R
 
 The implementation of Fixed Effects Nuclear Norm Matrix Completion is contained in:
 
+```text
 R/MCFE_soft_impute.R
+```
 
 Load the functions using:
 
+```r
 source("R/MCFE_soft_impute.R")
+```
 
 The main function is
 
+```r
 mcnnm_cv_R()
+```
 
 which estimates the model and selects the nuclear-norm regularization parameter by cross-validation.
 
 Its basic usage is:
 
+```r
 fit <- mcnnm_cv_R(
   M,
   mask,
@@ -97,33 +107,40 @@ fit <- mcnnm_cv_R(
   num_lam = 20,
   num_folds = 5
 )
+```
 
 where:
 
-M is the numeric matrix used by the algorithm;
-mask is a binary matrix with the same dimensions as M;
-mask[i, j] = 1 indicates an observed entry;
-mask[i, j] = 0 indicates an entry to be reconstructed.
+- `M` is the numeric matrix used by the algorithm;
+- `mask` is a binary matrix with the same dimensions as `M`;
+- `mask[i, j] = 1` indicates an observed entry;
+- `mask[i, j] = 0` indicates an entry to be reconstructed.
 
-Missing entries in M should be replaced by zero before fitting. Missingness is specified through mask, rather than through NA values.
+Missing entries in `M` should be replaced by zero before fitting. Missingness is specified through `mask`, rather than through `NA` values.
 
 The fitted matrix can be reconstructed as
 
+```r
 M_hat <- compute_matrix(
   fit$L,
   fit$u,
   fit$v
 )
+```
 
 The returned object also contains the selected regularization parameter and cross-validation results:
 
+```r
 fit$best_lambda
 fit$min_RMSE
 fit$Avg_RMSE
-Toy example: Fixed Effects Nuclear Norm Matrix Completion
+```
+
+# Toy example: Fixed Effects Nuclear Norm Matrix Completion
 
 The following example generates a low-rank panel matrix with unit and time effects, randomly removes 20% of its entries, and reconstructs them using FENNMC.
 
+```r
 source("R/MCFE_soft_impute.R")
 
 set.seed(123)
@@ -225,9 +242,11 @@ cat(
   fit$best_lambda,
   "\n"
 )
+```
 
 The example illustrates the basic workflow:
 
+```text
 complete matrix
       ↓
 artificial missingness
@@ -241,68 +260,77 @@ FENNMC estimation
 matrix reconstruction
       ↓
 out-of-sample evaluation
-Disabling fixed effects
+```
+
+# Disabling fixed effects
 
 The implementation also allows unit or time fixed effects to be excluded.
 
 For example, nuclear norm matrix completion without unit effects can be estimated with
 
+```r
 fit <- mcnnm_cv_R(
   M,
   mask,
   to_estimate_u = FALSE,
   to_estimate_v = TRUE
 )
+```
 
 and a model without either set of fixed effects with
 
+```r
 fit <- mcnnm_cv_R(
   M,
   mask,
   to_estimate_u = FALSE,
   to_estimate_v = FALSE
 )
-ESFNNMC
+```
+
+# ESFNNMC
 
 The proposed ESFNNMC method modifies the FENNMC specification by replacing the unrestricted unit effects
 
-[
+\[
 u
-]
+\]
 
 with
 
-[
+\[
 u = A\alpha,
-]
+\]
 
-where the columns of (A) are selected Moran eigenvectors derived from a spatial weights matrix.
+where the columns of \(A\) are selected Moran eigenvectors derived from a spatial weights matrix.
 
 The resulting decomposition is
 
-[
+\[
 M =
 L +
 A\alpha\mathbf{1}_T^\top +
 \mathbf{1}_n v^\top +
 E.
-]
+\]
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
 Code and examples for ESFNNMC are provided in the corresponding sections of this repository.
 
-Citation
+# Citation
 
 If you use this code, please cite:
 
+```text
 Metulini, R. (2026).
 Eigenvector Spatial Filters Nuclear Norm Matrix Completion
 with Application to Air Quality Data.
 Manuscript.
+```
 
 Citation information will be updated after publication.
 
-License
+# License
 
 License information will be added before the public release of the repository.
