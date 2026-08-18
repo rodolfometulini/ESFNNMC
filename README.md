@@ -23,9 +23,8 @@ be a partially observed matrix.
 
 The FENNMC estimator decomposes the matrix as
 
-\[
-M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E,
-\]
+$M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$,
+
 
 where:
 
@@ -36,14 +35,7 @@ where:
 
 The estimator solves
 
-\[
-\min_{L,u,v}
-\frac{1}{2}
-\sum_{(i,t)\in\Omega}
-(M_{it}-L_{it}-u_i-v_t)^2
-+
-\lambda \|L\|_*,
-\]
+$\min_{L,u,v} \frac{1}{2} \sum_{(i,t)\in\Omega} (M_{it}-L_{it}-u_i-v_t)^2 +\lambda \|L\|_*$,
 
 where \(\|L\|_*\) denotes the nuclear norm.
 
@@ -290,27 +282,17 @@ fit <- mcnnm_cv_R(
 
 The proposed ESFNNMC method modifies the FENNMC specification by replacing the unrestricted unit effects
 
-\[
-u
-\]
+$u$
 
 with
 
-\[
-u = A\alpha,
-\]
+$u = A\alpha$,
 
 where the columns of \(A\) are selected Moran eigenvectors derived from a spatial weights matrix.
 
 The resulting decomposition is
 
-\[
-M =
-L +
-A\alpha\mathbf{1}_T^\top +
-\mathbf{1}_n v^\top +
-E.
-\]
+$ M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$.
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
