@@ -60,13 +60,13 @@ The repository will be progressively updated with the code required to reproduce
 The implementation of Fixed Effects Nuclear Norm Matrix Completion is contained in:
 
 ```text
-R/MCFE_soft_impute.R
+R/FENNMC.R
 ```
 
 Load the functions using:
 
 ```r
-source("R/MCFE_soft_impute.R")
+source("R/FENNMC.R")
 ```
 
 The main function is
@@ -122,7 +122,7 @@ fit$Avg_RMSE
 The following example generates a low-rank panel matrix with unit and time effects, randomly removes 20% of its entries, and reconstructs them using FENNMC.
 
 ```r
-source("R/MCFE_soft_impute.R")
+source("R/FENNMC.R")
 
 set.seed(123)
 
@@ -271,19 +271,9 @@ fit <- mcnnm_cv_R(
 
 # ESFNNMC
 
-The proposed ESFNNMC method modifies the FENNMC specification by replacing the unrestricted unit effects
+The proposed ESFNNMC method modifies the FENNMC specification by replacing the unrestricted unit effects $u$ with $u = A\alpha$, where the columns of \(A\) are selected Moran eigenvectors derived from a spatial weights matrix.
 
-$u$
-
-with
-
-$u = A\alpha$,
-
-where the columns of \(A\) are selected Moran eigenvectors derived from a spatial weights matrix.
-
-The resulting decomposition is
-
-$M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$.
+The resulting decomposition is $M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$.
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
