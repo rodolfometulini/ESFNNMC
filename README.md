@@ -283,7 +283,7 @@ where the columns of \(A\) are selected Moran eigenvectors derived from a spatia
 
 The resulting decomposition is
 
-$ M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$.
+$M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$.
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
