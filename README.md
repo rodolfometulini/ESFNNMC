@@ -119,7 +119,7 @@ fit$Avg_RMSE
 
 # Toy example: Fixed Effects Nuclear Norm Matrix Completion
 
-The following example generates a low-rank panel matrix with unit and time effects, randomly removes 20% of its entries, and reconstructs them using FENNMC.
+The following example generates a low-rank panel matrix with unit and time effects, randomly removes 10% of its entries, and reconstructs them using FENNMC.
 
 ```r
 source("R/FENNMC.R")
@@ -287,6 +287,99 @@ This provides a parsimonious and interpretable representation of spatially struc
 
 Code and examples for ESFNNMC are provided in the corresponding sections of this repository.
 
+
+# Toy example: ESF Nuclear Norm Matrix Completion
+
+The following example ....
+
+```r
+set.seed(123)
+
+# 1. Synthetic coordinates and spatial weights
+n <- 40
+p <- 80
+coords <- cbind(
+  Longitude = runif(n, 8, 11),
+  Latitude  = runif(n, 44, 47)
+)
+
+W_knn <- build_knn_weights(coords = coords, k = 5, symmetrize = TRUE)
+
+# 2. Spatial eigenvectors used by ESFNNMC
+sel_knn <- select_spatial_evec(W_knn, explained = 0.90)
+A_knn <- sel_knn$A
+
+# 3. Synthetic low-rank data matrix with spatial and time components
+rank_true <- 5
+U <- matrix(rnorm(n * rank_true), n, rank_true)
+V <- matrix(rnorm(p * rank_true), p, rank_true)
+L_true <- U %*% t(V)
+
+alpha_true <- rnorm(ncol(A_knn))
+v_true <- rnorm(p)
+
+M_true <- L_true +
+  as.vector(A_knn %*% alpha_true) %*% matrix(1, 1, p) +
+  matrix(1, n, 1) %*% t(v_true)
+
+M_obs <- M_true + matrix(rnorm(n * p, sd = 0.5), n, p)
+
+# 4. Artificial missingness
+mask <- matrix(rbinom(n * p, size = 1, prob = 0.90), n, p)
+M_input <- M_obs
+M_input[mask == 0] <- 0
+
+# 5. ESFNNMC fit
+fit <- mcnnm_cv_R_with_A(
+  M = M_input,
+  mask = mask,
+  A = A_knn,
+  num_lam = 20,
+  to_estimate_alpha = TRUE,
+  to_estimate_v = TRUE,
+  num_folds = 5,
+  cv_ratio = 0.6,
+  niter = 200,
+  rel_tol = 1e-5,
+  is_quiet = TRUE
+)
+
+# 6. Reconstructed matrix
+M_hat <- fit$L +
+  as.vector(A_knn %*% fit$alpha) %*% matrix(1, 1, p) +
+  matrix(1, n, 1) %*% t(fit$v)
+  
+# --------------------------------------------------
+# 7. Evaluate reconstruction on missing entries
+# --------------------------------------------------
+
+test <- mask == 0
+
+rmse_missing <- sqrt( mean( (M_input[test] - M_hat[test])^2 ) )
+
+cat(
+  "RMSE on artificially missing entries:",
+  round(rmse_missing, 4),
+  "\n"
+)
+
+mape_missing <- mean(
+  abs((M_input[test] - M_hat[test]) / M_input[test])
+) * 100
+
+cat(
+  "MAPE on artificially missing entries:",
+  round(mape_missing, 4),
+  "\n"
+)
+
+cat(
+  "Selected lambda:",
+  fit$best_lambda,
+  "\n"
+)
+  
+```
 
 # Citation
 
