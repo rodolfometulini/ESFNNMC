@@ -182,13 +182,15 @@ cat(
 fit <- mcnnm_cv_R(
   M = M,
   mask = mask,
-  to_estimate_u = TRUE,
-  to_estimate_v = TRUE,
-  num_lam = 20,
-  num_folds = 5,
-  cv_ratio = 0.8,
-  is_quiet = FALSE
-)
+      num_lam = 20,
+      to_estimate_u = TRUE,
+      to_estimate_v = TRUE,
+      num_folds = 5,
+      cv_ratio = 0.6,
+      niter = 200,
+      rel_tol = 1e-5,
+      is_quiet = TRUE
+    )
 
 # --------------------------------------------------
 # 4. Reconstruct the matrix
@@ -206,15 +208,21 @@ M_hat <- compute_matrix(
 
 test <- mask == 0
 
-rmse_missing <- sqrt(
-  mean(
-    (M_complete[test] - M_hat[test])^2
-  )
-)
+rmse_missing <- sqrt( mean( (M_complete[test] - M_hat[test])^2 ) )
 
 cat(
   "RMSE on artificially missing entries:",
   round(rmse_missing, 4),
+  "\n"
+)
+
+mape_missing <- mean(
+  abs((M_complete[test] - M_hat[test]) / M_complete[test])
+) * 100
+
+cat(
+  "MAPE on artificially missing entries:",
+  round(mape_missing, 4),
   "\n"
 )
 
