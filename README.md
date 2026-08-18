@@ -17,9 +17,7 @@ The repository also contains reproducible examples illustrating how the methods 
 
 Let
 
-\[
-M \in \mathbb{R}^{n \times T}
-\]
+$M \in \mathbb{R}^{n \times T}$
 
 be a partially observed matrix.
 
@@ -323,14 +321,13 @@ Code and examples for ESFNNMC are provided in the corresponding sections of this
 If you use this code, please cite:
 
 ```text
-Metulini, R. (2026).
-Eigenvector Spatial Filters Nuclear Norm Matrix Completion
-with Application to Air Quality Data.
-Manuscript.
+Metulini, R. (2026). 
+Eigenvector Spatial Filters Nuclear Norm Matrix Completion with Application to Air Quality Data. 
+arXiv preprint arXiv:2606.05450.
 ```
 
 Citation information will be updated after publication.
 
 # License
 
-License information will be added before the public release of the repository.
+TBD
