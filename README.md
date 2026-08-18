@@ -119,7 +119,7 @@ fit$Avg_RMSE
 
 # Toy example: Fixed Effects Nuclear Norm Matrix Completion
 
-The following example generates a low-rank panel matrix with unit and time effects, randomly removes 10% of its entries, and reconstructs them using FENNMC.
+The following example generates a simple synthetic matrix, randomly removes 10% of its entries, and reconstructs them using FENNMC.
 
 ```r
 source("R/FENNMC.R")
@@ -127,30 +127,11 @@ source("R/FENNMC.R")
 set.seed(123)
 
 # --------------------------------------------------
-# 1. Generate a synthetic low-rank panel
+# 1. Generate a synthetic matrix
 # --------------------------------------------------
-
-n <- 20
-T <- 30
-r <- 3
-
-U <- matrix(rnorm(n * r), n, r)
-V <- matrix(rnorm(T * r), T, r)
-
-L_true <- U %*% t(V)
-
-# Unit fixed effects
-u_true <- rnorm(n, sd = 2)
-
-# Time fixed effects
-v_true <- sin(seq(0, 2 * pi, length.out = T)) * 2
-
-# Complete matrix
-M_complete <-
-  L_true +
-  outer(u_true, rep(1, T)) +
-  outer(rep(1, n), v_true) +
-  matrix(rnorm(n * T, sd = 0.2), n, T)
+n <- 40
+T <- 40
+M_complete <- matrix(rnorm(n * T), nrow = n, ncol = T)
 
 # --------------------------------------------------
 # 2. Introduce missing entries
@@ -285,47 +266,103 @@ The resulting decomposition is $M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n 
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
-Code and examples for ESFNNMC are provided in the corresponding sections of this repository.
+# ESFNNMC in R
+
+The implementation of Eigenvector Spatial Filters Nuclear Norm Matrix Completion is contained in:
+
+```text
+R/ESFNNMC.R
+```
+
+Load the functions using (In the following order):
+
+```r
+source("R/FENNMC.R")
+source("R/Weight_matrix.R")
+source("R/Spatial_eigenvectors.R")
+
+```
+
+The main function is
+
+```r
+mcnnm_cv_R_with_A()
+```
+
+Its basic usage is:
+
+```r
+fit <- mcnnm_cv_R_with_A(
+  M = M,
+  mask = mask,
+  A = A,
+  num_lam = 20,
+  to_estimate_alpha = TRUE,
+  to_estimate_v = TRUE,
+  num_folds = 5,
+  cv_ratio = 0.6,
+  niter = 200,
+  rel_tol = 1e-5,
+  is_quiet = TRUE
+)
+
+```
+
+where:
+
+- `M` is the numeric matrix used by the algorithm;
+- `mask` is a binary matrix with the same dimensions as `M`;
+- `mask[i, j] = 1` indicates an observed entry;
+- `mask[i, j] = 0` indicates an entry to be reconstructed.
+- `A` is the numeric matrix containing in columns the q selected eigenvectors
+
+Missing entries in `M` should be replaced by zero before fitting. Missingness is specified through `mask`, rather than through `NA` values.
+
+The fitted matrix can be reconstructed as
+
+```r
+M_hat <- fit$L +
+  as.vector(A_knn %*% fit$alpha) %*% matrix(1, 1, p) +
+  matrix(1, n, 1) %*% t(fit$v)
+```
+
+The returned object also contains the selected regularization parameter and cross-validation results:
+
+```r
+fit$best_lambda
+fit$min_RMSE
+fit$Avg_RMSE
+```
 
 
 # Toy example: ESF Nuclear Norm Matrix Completion
 
-The following example ....
+The following example generates a simple synthetic matrix, randomly removes 10% of its entries, and reconstructs them using ESFNNMC.
 
 ```r
 set.seed(123)
 
 # 1. Synthetic coordinates and spatial weights
 n <- 40
-p <- 80
+T <- 40
 coords <- cbind(
   Longitude = runif(n, 8, 11),
   Latitude  = runif(n, 44, 47)
 )
 
+# the number of neighbours must be chosen
 W_knn <- build_knn_weights(coords = coords, k = 5, symmetrize = TRUE)
 
 # 2. Spatial eigenvectors used by ESFNNMC
 sel_knn <- select_spatial_evec(W_knn, explained = 0.90)
 A_knn <- sel_knn$A
 
-# 3. Synthetic low-rank data matrix with spatial and time components
-rank_true <- 5
-U <- matrix(rnorm(n * rank_true), n, rank_true)
-V <- matrix(rnorm(p * rank_true), p, rank_true)
-L_true <- U %*% t(V)
+# 3. Synthetic matrix
 
-alpha_true <- rnorm(ncol(A_knn))
-v_true <- rnorm(p)
-
-M_true <- L_true +
-  as.vector(A_knn %*% alpha_true) %*% matrix(1, 1, p) +
-  matrix(1, n, 1) %*% t(v_true)
-
-M_obs <- M_true + matrix(rnorm(n * p, sd = 0.5), n, p)
+M_obs <- matrix(rnorm(n * T), nrow = n, ncol = T)
 
 # 4. Artificial missingness
-mask <- matrix(rbinom(n * p, size = 1, prob = 0.90), n, p)
+mask <- matrix(rbinom(n * T, size = 1, prob = 0.90), n, T)
 M_input <- M_obs
 M_input[mask == 0] <- 0
 
@@ -346,7 +383,7 @@ fit <- mcnnm_cv_R_with_A(
 
 # 6. Reconstructed matrix
 M_hat <- fit$L +
-  as.vector(A_knn %*% fit$alpha) %*% matrix(1, 1, p) +
+  as.vector(A_knn %*% fit$alpha) %*% matrix(1, 1, T) +
   matrix(1, n, 1) %*% t(fit$v)
   
 # --------------------------------------------------
@@ -364,7 +401,7 @@ cat(
 )
 
 mape_missing <- mean(
-  abs((M_input[test] - M_hat[test]) / M_input[test])
+  abs((M_obs[test] - M_hat[test]) / M_obs[test])
 ) * 100
 
 cat(
