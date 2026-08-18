@@ -15,29 +15,20 @@ The repository also contains reproducible examples illustrating how the methods 
 
 ## Model overview
 
-Let
+Let $M \in \mathbb{R}^{n \times T}$ be a partially observed matrix.
 
-$M \in \mathbb{R}^{n \times T}$
-
-be a partially observed matrix.
-
-The FENNMC estimator decomposes the matrix as
-
-$M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$,
-
+The FENNMC estimator (Athey et al., 2021) decomposes the matrix as $M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$,
 
 where:
 
-- \(L\) is a low-rank latent component;
-- \(u\) contains unit fixed effects;
-- \(v\) contains time fixed effects;
-- \(E\) is the residual component.
+- $L$ is a low-rank latent component;
+- $u$ contains unit fixed effects;
+- $v$ contains time fixed effects;
+- $E$ is the residual component.
 
-The estimator solves
+The estimator solves $\min_{L,u,v} \frac{1}{2} \sum_{(i,t)\in\Omega} (M_{it}-L_{it}-u_i-v_t)^2 +\lambda \|L\|_*$,
 
-$\min_{L,u,v} \frac{1}{2} \sum_{(i,t)\in\Omega} (M_{it}-L_{it}-u_i-v_t)^2 +\lambda \|L\|_*$,
-
-where \(\|L\|_*\) denotes the nuclear norm.
+where $\|L\|_*$ denotes the nuclear norm.
 
 Estimation is performed through a block-coordinate descent algorithm alternating between:
 
@@ -45,7 +36,7 @@ Estimation is performed through a block-coordinate descent algorithm alternating
 2. time fixed effects;
 3. the low-rank component, updated through singular-value soft thresholding.
 
-The regularization parameter \(\lambda\) can be selected by cross-validation.
+The regularization parameter $\lambda$ is selected by cross-validation.
 
 ## Repository structure
 
@@ -298,6 +289,7 @@ This provides a parsimonious and interpretable representation of spatially struc
 
 Code and examples for ESFNNMC are provided in the corresponding sections of this repository.
 
+
 # Citation
 
 If you use this code, please cite:
@@ -313,3 +305,11 @@ Citation information will be updated after publication.
 # License
 
 TBD
+
+# References
+
+```text
+Athey, S., Bayati, M., Doudchenko, N., Imbens, G., & Khosravi, K. (2021). 
+Matrix completion methods for causal panel data models. 
+Journal of the American Statistical Association, 116(536), 1716-1730.
+```
