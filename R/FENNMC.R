@@ -1,5 +1,10 @@
+# Fixed-effects nuclear-norm matrix completion benchmark
+#
+# This file contains the R implementation of the fixed-effects nuclear-norm
+# matrix completion estimator used as benchmark. The code follows the logic of
+# the C++ implementation in Athey et al. (2021), using alternating updates for
+# row effects, column effects, and the low-rank component via soft-impute.
 
-######### R function translated from C++
 
 # logarithmically spaced sequence (like logsp in C++)
 logsp <- function(start_log, end_log, num_points) {
@@ -201,7 +206,7 @@ create_folds <- function(M, mask, to_estimate_u = TRUE, to_estimate_v = TRUE,
 
 ### --- Main NNM_CV translation to R --- ###
 # This mirrors the logic in C++ NNM_CV
-mcnnm_cv_R <- function(M, mask,
+fennmc <- function(M, mask,
                        to_estimate_u = TRUE, to_estimate_v = TRUE,
                        num_lam = 20, niter = 1000, rel_tol = 1e-5,
                        cv_ratio = 0.6, num_folds = 5, is_quiet = TRUE) {
@@ -276,5 +281,4 @@ mcnnm_cv_R <- function(M, mask,
        lambda_L = lambda_Ls)
 }
 
-##### END FUNCTIONS #####
 
