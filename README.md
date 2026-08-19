@@ -6,8 +6,8 @@ This repository contains the R code accompanying the paper:
 
 The repository provides implementations of:
 
-- **FENNMC** — Fixed Effects Nuclear Norm Matrix Completion, used as the main benchmark;
 - **ESFNNMC** — Eigenvector Spatial Filters Nuclear Norm Matrix Completion, the spatial extension proposed in the paper.
+- **FENNMC** — Fixed Effects Nuclear Norm Matrix Completion (Athey et al., 2021), used as the main benchmark;
 
 ESFNNMC extends fixed-effects nuclear norm matrix completion by replacing unrestricted unit fixed effects with a parsimonious representation based on Moran eigenvectors derived from a spatial weights matrix.
 
@@ -17,7 +17,7 @@ The repository also contains reproducible examples illustrating how the methods 
 
 Let $M \in \mathbb{R}^{n \times T}$ be a partially observed matrix.
 
-The FENNMC estimator (Athey et al., 2021) decomposes the matrix as $M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$,
+In short, the FENNMC estimator (Athey et al., 2021) decomposes the matrix as $M = L + u\mathbf{1}_T^\top + \mathbf{1}_n v^\top + E$,
 
 where:
 
@@ -38,227 +38,7 @@ Estimation is performed through a block-coordinate descent algorithm alternating
 
 The regularization parameter $\lambda$ is selected by cross-validation.
 
-## Repository structure
-
-```text
-.
-├── README.md
-├── R/
-│   ├── MCFE_soft_impute.R
-│   └── ESFNNMC.R
-├── examples/
-│   ├── toy_FENNMC.R
-│   └── toy_ESFNNMC.R
-└── application/
-    └── ...
-```
-
-The repository will be progressively updated with the code required to reproduce the simulation study and the empirical application presented in the paper.
-
-# FENNMC in R
-
-The implementation of Fixed Effects Nuclear Norm Matrix Completion is contained in:
-
-```text
-R/FENNMC.R
-```
-
-Load the functions using:
-
-```r
-source("R/FENNMC.R")
-```
-
-The main function is
-
-```r
-mcnnm_cv_R()
-```
-
-which estimates the model and selects the nuclear-norm regularization parameter by cross-validation.
-
-Its basic usage is:
-
-```r
-fit <- mcnnm_cv_R(
-  M,
-  mask,
-  to_estimate_u = TRUE,
-  to_estimate_v = TRUE,
-  num_lam = 20,
-  num_folds = 5
-)
-```
-
-where:
-
-- `M` is the numeric matrix used by the algorithm;
-- `mask` is a binary matrix with the same dimensions as `M`;
-- `mask[i, j] = 1` indicates an observed entry;
-- `mask[i, j] = 0` indicates an entry to be reconstructed.
-
-Missing entries in `M` should be replaced by zero before fitting. Missingness is specified through `mask`, rather than through `NA` values.
-
-The fitted matrix can be reconstructed as
-
-```r
-M_hat <- compute_matrix(
-  fit$L,
-  fit$u,
-  fit$v
-)
-```
-
-The returned object also contains the selected regularization parameter and cross-validation results:
-
-```r
-fit$best_lambda
-fit$min_RMSE
-fit$Avg_RMSE
-```
-
-# Toy example: Fixed Effects Nuclear Norm Matrix Completion
-
-The following example generates a simple synthetic matrix, randomly removes 10% of its entries, and reconstructs them using FENNMC.
-
-```r
-source("R/FENNMC.R")
-
-set.seed(123)
-
-# --------------------------------------------------
-# 1. Generate a synthetic matrix
-# --------------------------------------------------
-n <- 40
-T <- 40
-M_complete <- matrix(rnorm(n * T), nrow = n, ncol = T)
-
-# --------------------------------------------------
-# 2. Introduce missing entries
-# --------------------------------------------------
-
-missing_rate <- 0.20
-
-mask <- matrix(
-  rbinom(n * T, 1, 1 - missing_rate),
-  n,
-  T
-)
-
-# The algorithm uses a numeric matrix and a
-# separate observation mask.
-M <- M_complete
-M[mask == 0] <- 0
-
-cat(
-  "Percentage of missing entries:",
-  round(100 * mean(mask == 0), 1),
-  "%\n"
-)
-
-# --------------------------------------------------
-# 3. Fit FENNMC
-# --------------------------------------------------
-
-fit <- mcnnm_cv_R(
-  M = M,
-  mask = mask,
-      num_lam = 20,
-      to_estimate_u = TRUE,
-      to_estimate_v = TRUE,
-      num_folds = 5,
-      cv_ratio = 0.6,
-      niter = 200,
-      rel_tol = 1e-5,
-      is_quiet = TRUE
-    )
-
-# --------------------------------------------------
-# 4. Reconstruct the matrix
-# --------------------------------------------------
-
-M_hat <- compute_matrix(
-  fit$L,
-  fit$u,
-  fit$v
-)
-
-# --------------------------------------------------
-# 5. Evaluate reconstruction on missing entries
-# --------------------------------------------------
-
-test <- mask == 0
-
-rmse_missing <- sqrt( mean( (M_complete[test] - M_hat[test])^2 ) )
-
-cat(
-  "RMSE on artificially missing entries:",
-  round(rmse_missing, 4),
-  "\n"
-)
-
-mape_missing <- mean(
-  abs((M_complete[test] - M_hat[test]) / M_complete[test])
-) * 100
-
-cat(
-  "MAPE on artificially missing entries:",
-  round(mape_missing, 4),
-  "\n"
-)
-
-cat(
-  "Selected lambda:",
-  fit$best_lambda,
-  "\n"
-)
-```
-
-The example illustrates the basic workflow:
-
-```text
-complete matrix
-      ↓
-artificial missingness
-      ↓
-observation mask
-      ↓
-cross-validation for lambda
-      ↓
-FENNMC estimation
-      ↓
-matrix reconstruction
-      ↓
-out-of-sample evaluation
-```
-
-# Disabling fixed effects
-
-The implementation also allows unit or time fixed effects to be excluded.
-
-For example, nuclear norm matrix completion without unit effects can be estimated with
-
-```r
-fit <- mcnnm_cv_R(
-  M,
-  mask,
-  to_estimate_u = FALSE,
-  to_estimate_v = TRUE
-)
-```
-
-and a model without either set of fixed effects with
-
-```r
-fit <- mcnnm_cv_R(
-  M,
-  mask,
-  to_estimate_u = FALSE,
-  to_estimate_v = FALSE
-)
-```
-
-# ESFNNMC
+**ESFNNMC**
 
 The proposed ESFNNMC method modifies the FENNMC specification by replacing the unrestricted unit effects $u$ with $u = A\alpha$, where the columns of \(A\) are selected Moran eigenvectors derived from a spatial weights matrix.
 
@@ -266,45 +46,85 @@ The resulting decomposition is $M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n 
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
-# ESFNNMC in R
 
-The implementation of Eigenvector Spatial Filters Nuclear Norm Matrix Completion is contained in:
+## Repository structure
 
 ```text
-R/ESFNNMC.R
+.
+├── README.md
+├── R/
+│   ├── FENNMC.R
+│   └── ESFNNMC.R
+├── examples/
+│   ├── toy_FENNMC.R
+│   └── toy_ESFNNMC.R
+└── application/
+|__ simulation/
+    └── ...
 ```
 
-Load the functions using (In the following order):
+The repository will be progressively updated with the code required to reproduce the simulation study and the empirical application presented in the paper.
+
+# ESFNNMC and FENNMC in R
+
+The implementation of Eigenvector Spatial Filters Nuclear Norm Matrix Completion (ESFNNMC) and Fixed Effects Nuclear Norm Matrix Completion (FENNMC) is contained in:
+
+```text
+R/FENNMC.R
+R/ESFNNMC.R
+R/Weight_matrix.R
+R/Spatial_eigenvectors.R
+```
+
+Load the functions using (in this order):
 
 ```r
 source("R/FENNMC.R")
+source("R/FENNMC.R")
 source("R/Weight_matrix.R")
 source("R/Spatial_eigenvectors.R")
-
 ```
 
-The main function is
+The main functions are
 
 ```r
-mcnnm_cv_R_with_A()
+fennmc()
+esfnnmc()
 ```
 
-Its basic usage is:
+which estimate the model and selects the nuclear-norm regularization parameter by cross-validation.
+
+The basic usage is:
 
 ```r
-fit <- mcnnm_cv_R_with_A(
-  M = M,
-  mask = mask,
-  A = A,
-  num_lam = 20,
-  to_estimate_alpha = TRUE,
+fit <- fennmc(
+  M,
+  mask,
+  to_estimate_u = TRUE,
   to_estimate_v = TRUE,
+  num_lam = 20,
   num_folds = 5,
   cv_ratio = 0.6,
   niter = 200,
   rel_tol = 1e-5,
-  is_quiet = TRUE
+  is_quiet = FALSE
 )
+
+
+fit <- esfnnmc(
+  M,
+  mask,
+  A,
+  to_estimate_alpha = TRUE,
+  to_estimate_v = TRUE,
+  num_lam = 20,
+  num_folds = 5,
+  cv_ratio = 0.6,
+  niter = 200,
+  rel_tol = 1e-5,
+  is_quiet = FALSE
+)
+
 
 ```
 
@@ -318,12 +138,25 @@ where:
 
 Missing entries in `M` should be replaced by zero before fitting. Missingness is specified through `mask`, rather than through `NA` values.
 
-The fitted matrix can be reconstructed as
+The fitted matrix for FENNMC can be reconstructed as
 
 ```r
-M_hat <- fit$L +
-  as.vector(A_knn %*% fit$alpha) %*% matrix(1, 1, p) +
-  matrix(1, n, 1) %*% t(fit$v)
+M_hat <- compute_matrix(
+  fit$L,
+  fit$u,
+  fit$v
+)
+```
+while for ESFNNMC can be reconstructed as
+
+```r
+M_hat = compute_matrix_with_A(
+  fit$L,
+  A,
+  fit$alpha,
+  fit$v
+)
+
 ```
 
 The returned object also contains the selected regularization parameter and cross-validation results:
@@ -334,15 +167,23 @@ fit$min_RMSE
 fit$Avg_RMSE
 ```
 
+# Toy example
 
-# Toy example: ESF Nuclear Norm Matrix Completion
-
-The following example generates a simple synthetic matrix, randomly removes 10% of its entries, and reconstructs them using ESFNNMC.
+The following example generates a simple synthetic matrix, randomly removes 10% of its entries, and reconstructs them using ESFNNMC and FENNMC.
 
 ```r
+source("R/FENNMC.R")
+source("R/FENNMC.R")
+source("R/Weight_matrix.R")
+source("R/Spatial_eigenvectors.R")
+
+
 set.seed(123)
 
+
+# --------------------------------------------------
 # 1. Synthetic coordinates and spatial weights
+# --------------------------------------------------
 n <- 40
 T <- 40
 coords <- cbind(
@@ -351,24 +192,64 @@ coords <- cbind(
 )
 
 # the number of neighbours must be chosen
-W_knn <- build_knn_weights(coords = coords, k = 5, symmetrize = TRUE)
+k = 5
+W_knn <- build_knn_weights(coords = coords, k, symmetrize = TRUE)
 
+# --------------------------------------------------
 # 2. Spatial eigenvectors used by ESFNNMC
-sel_knn <- select_spatial_evec(W_knn, explained = 0.90)
+# --------------------------------------------------
+tau = 0.90
+sel_knn <- select_spatial_evec(W_knn, explained = tau)
 A_knn <- sel_knn$A
 
-# 3. Synthetic matrix
+# --------------------------------------------------
+# 3. Generate a synthetic matrix
+# --------------------------------------------------
 
 M_obs <- matrix(rnorm(n * T), nrow = n, ncol = T)
 
-# 4. Artificial missingness
-mask <- matrix(rbinom(n * T, size = 1, prob = 0.90), n, T)
-M_input <- M_obs
-M_input[mask == 0] <- 0
+# --------------------------------------------------
+# 4. Introduce missing entries
+# --------------------------------------------------
 
-# 5. ESFNNMC fit
-fit <- mcnnm_cv_R_with_A(
-  M = M_input,
+missing_rate <- 0.10
+
+mask <- matrix(
+  rbinom(n * T, 1, 1 - missing_rate),
+  n,
+  T
+)
+
+# The algorithm uses a numeric matrix and a
+# separate observation mask.
+M <- M_obs
+M[mask == 0] <- 0
+
+cat(
+  "Percentage of missing entries:",
+  round(100 * mean(mask == 0), 1),
+  "%\n"
+)
+
+# --------------------------------------------------
+# 5. Fit ESFNNMC and FENNMC 
+# --------------------------------------------------
+
+fit_FENNMC <- fennmc(
+  M = M,
+  mask = mask,
+      num_lam = 20,
+      to_estimate_u = TRUE,
+      to_estimate_v = TRUE,
+      num_folds = 5,
+      cv_ratio = 0.6,
+      niter = 200,
+      rel_tol = 1e-5,
+      is_quiet = TRUE
+    )
+    
+fit_ESFNNMC <- esfnnmc(
+  M = M,
   mask = mask,
   A = A_knn,
   num_lam = 20,
@@ -381,42 +262,121 @@ fit <- mcnnm_cv_R_with_A(
   is_quiet = TRUE
 )
 
-# 6. Reconstructed matrix
-M_hat <- fit$L +
-  as.vector(A_knn %*% fit$alpha) %*% matrix(1, 1, T) +
-  matrix(1, n, 1) %*% t(fit$v)
-  
+
+# --------------------------------------------------
+# 6. Reconstruct the matrix
+# --------------------------------------------------
+
+M_hat_FENNMC <- compute_matrix(
+  fit$L,
+  fit$u,
+  fit$v
+)
+
+M_hat_ESFNNMC <- compute_matrix_with_A(
+  fit$L,
+  A,
+  fit$alpha,
+  fit$v
+)
+
+
+
 # --------------------------------------------------
 # 7. Evaluate reconstruction on missing entries
 # --------------------------------------------------
 
 test <- mask == 0
 
-rmse_missing <- sqrt( mean( (M_input[test] - M_hat[test])^2 ) )
+# ESFNNMC
+rmse <- sqrt( mean( (M_obs[test] - M_hat_ESFNNMC[test])^2 ) )
 
 cat(
   "RMSE on artificially missing entries:",
-  round(rmse_missing, 4),
+  round(rmse, 4),
   "\n"
 )
 
-mape_missing <- mean(
-  abs((M_obs[test] - M_hat[test]) / M_obs[test])
+mape <- mean(
+  abs((M_obs[test] - M_hat_ESFNNMC[test]) / M_obs[test])
 ) * 100
 
 cat(
   "MAPE on artificially missing entries:",
-  round(mape_missing, 4),
+  round(mape, 4),
   "\n"
 )
 
 cat(
   "Selected lambda:",
-  fit$best_lambda,
+  fit_ESFNNMC$best_lambda,
   "\n"
 )
-  
+
+# FENNMC
+rmse <- sqrt( mean( (M_obs[test] - M_hat_FENNMC[test])^2 ) )
+
+cat(
+  "RMSE on artificially missing entries:",
+  round(rmse, 4),
+  "\n"
+)
+
+mape <- mean(
+  abs((M_obs[test] - M_hat_FENNMC[test]) / M_obs[test])
+) * 100
+
+cat(
+  "MAPE on artificially missing entries:",
+  round(mape, 4),
+  "\n"
+)
+
+cat(
+  "Selected lambda:",
+  fit_FENNMC$best_lambda,
+  "\n"
+)
 ```
+
+# Disabling fixed effects
+
+The implementation also allows unit or time fixed effects to be excluded.
+
+For example, FE nuclear norm matrix completion without time effects can be estimated with
+
+```r
+fit_FENNMC_notime <- fennmc(
+  M = M,
+  mask = mask,
+      num_lam = 20,
+      to_estimate_u = TRUE,
+      to_estimate_v = FALSE,
+      num_folds = 5,
+      cv_ratio = 0.6,
+      niter = 200,
+      rel_tol = 1e-5,
+      is_quiet = TRUE
+    )
+```
+and ESF nuclear norm matrix completion without unit effects can be estimated with
+
+```r
+fit_ESFNNMC_notime <- esfnnmc(
+M = M,
+  mask = mask,
+  A = A_knn,
+  num_lam = 20,
+  to_estimate_alpha = TRUE,
+  to_estimate_v = FALSE,
+  num_folds = 5,
+  cv_ratio = 0.6,
+  niter = 200,
+  rel_tol = 1e-5,
+  is_quiet = TRUE
+    )
+``` 
+
 
 # Citation
 
@@ -432,7 +392,7 @@ Citation information will be updated after publication.
 
 # License
 
-TBD
+ARXiv CC BY 4.0
 
 # References
 
