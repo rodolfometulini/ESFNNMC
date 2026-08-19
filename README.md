@@ -2,7 +2,7 @@
 
 This repository contains the R code accompanying the paper:
 
-**Eigenvector Spatial Filters Nuclear Norm Matrix Completion with Application to Air Quality Data**
+**Eigenvector Spatial Filters Nuclear Norm Matrix Completion with Application to Air Quality Data** (https://arxiv.org/abs/2606.05450)
 
 The repository provides implementations of:
 
