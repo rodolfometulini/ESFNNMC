@@ -1,4 +1,4 @@
-# application
+# Application
 
 This code allows to reproduce the results of the application (section 4).
 In particular: 
