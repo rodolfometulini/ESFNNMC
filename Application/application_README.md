@@ -6,7 +6,7 @@ The codes in
 Application/Application.R
 ```
 
-allows to reproduce the results of the application (section 4).
+allow to reproduce the results of the application (section 4).
 In particular: 
 
 - Figures 1, 2, 3, 4 and 5.
