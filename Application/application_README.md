@@ -1,6 +1,12 @@
 # Application
 
-This code allows to reproduce the results of the application (section 4).
+The codes in 
+
+```text
+Application/Application.R
+```
+
+allows to reproduce the results of the application (section 4).
 In particular: 
 
 - Figures 1, 2, 3, 4 and 5.
