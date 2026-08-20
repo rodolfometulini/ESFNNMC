@@ -53,14 +53,26 @@ This provides a parsimonious and interpretable representation of spatially struc
 .
 ├── README.md
 ├── R/
+│   ├── ESFNNMC.R
 │   ├── FENNMC.R
-│   └── ESFNNMC.R
-├── examples/
-│   ├── toy_FENNMC.R
-│   └── toy_ESFNNMC.R
-└── application/
-|__ simulation/
-    └── ...
+│   ├── Spatial_eigenvectors.R
+│   ├── Weight_matrix.R
+│   └── source files_README.md
+├── Data/
+│   ├── Agrimonia_stations.RData
+│   ├── data_README.md
+│   ├── georef-italy-regione-millesime.cpg
+│   ├── georef-italy-regione-millesime.dbf
+│   ├── georef-italy-regione-millesime.prj
+│   ├── georef-italy-regione-millesime.shp
+│   └── georef-italy-regione-millesime.shx
+├── Simulation/
+│   ├── DGP_functions.R
+│   ├── Simulations.R
+│   └── simulation_README.md
+└── Application/
+    ├── Application.R
+    └── application_README.md
 ```
 
 The repository will be progressively updated with the code required to reproduce the simulation study and the empirical application presented in the paper.
