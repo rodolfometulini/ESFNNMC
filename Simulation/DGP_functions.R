@@ -303,3 +303,4 @@ generate_low_rank_fixed_effects <- function(
     positivity_shift = positivity_shift,
     singular_values = svd(M)$d
   ))
+}
