@@ -55,15 +55,16 @@ Below you can also find a toy example illustrating how the method can be used to
 ```text
 .
 ├── README.md
+├── CITATION.cff
 ├── R/
+│   ├── README.md
 │   ├── ESFNNMC.R
 │   ├── FENNMC.R
 │   ├── Spatial_eigenvectors.R
-│   ├── Weight_matrix.R
-│   └── README.md
+│   └── Weight_matrix.R
 ├── Data/
-│   ├── Agrimonia_stations.RData
 │   ├── README.md
+│   ├── Agrimonia_stations.RData
 │   ├── georef-italy-regione-millesime.cpg
 │   ├── georef-italy-regione-millesime.dbf
 │   ├── georef-italy-regione-millesime.prj
@@ -72,6 +73,9 @@ Below you can also find a toy example illustrating how the method can be used to
 ├── Simulation/
 │   ├── DGP_functions.R
 │   ├── Simulations.R
+│   └── README.md
+├── Examples/
+│   ├── Toy_example.R
 │   └── README.md
 └── Application/
     ├── Application.R
