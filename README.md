@@ -11,8 +11,6 @@ The repository provides implementations of:
 
 ESFNNMC extends fixed-effects nuclear norm matrix completion by replacing unrestricted unit fixed effects with a parsimonious representation based on Moran eigenvectors derived from a spatial weights matrix.
 
-The repository also contains reproducible examples illustrating how the methods can be used to reconstruct missing entries in partially observed panel and spatio-temporal matrices.
-
 ## Model overview
 
 Let $M \in \mathbb{R}^{n \times T}$ be a partially observed matrix.
@@ -46,6 +44,11 @@ The resulting decomposition is $M = L + A\alpha\mathbf{1}_T^\top + \mathbf{1}_n 
 
 This provides a parsimonious and interpretable representation of spatially structured unit heterogeneity.
 
+The method is primarily designed for environmental panel data, where observations are collected over time across multiple spatial locations. 
+Accordingly, we illustrate its application using daily air quality measurements from monitoring stations in Lombardy, Italy. 
+More generally, however, the proposed framework is applicable to any data matrix that admits an approximately low-rank representation and whose observational units may exhibit spatial dependence.
+
+Below you can also find a toy example illustrating how the method can be used to reconstruct missing entries in partially observed matrices.
 
 ## Repository structure
 
@@ -57,10 +60,10 @@ This provides a parsimonious and interpretable representation of spatially struc
 │   ├── FENNMC.R
 │   ├── Spatial_eigenvectors.R
 │   ├── Weight_matrix.R
-│   └── source files_README.md
+│   └── 00.R_README.md
 ├── Data/
 │   ├── Agrimonia_stations.RData
-│   ├── data_README.md
+│   ├── 00.data_README.md
 │   ├── georef-italy-regione-millesime.cpg
 │   ├── georef-italy-regione-millesime.dbf
 │   ├── georef-italy-regione-millesime.prj
@@ -69,10 +72,10 @@ This provides a parsimonious and interpretable representation of spatially struc
 ├── Simulation/
 │   ├── DGP_functions.R
 │   ├── Simulations.R
-│   └── simulation_README.md
+│   └── 00.simulation_README.md
 └── Application/
     ├── Application.R
-    └── application_README.md
+    └── 00.application_README.md
 ```
 
 The repository will be progressively updated with the code required to reproduce the simulation study and the empirical application presented in the paper.
