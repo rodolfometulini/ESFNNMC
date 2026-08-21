@@ -36,7 +36,7 @@ Estimation is performed through a block-coordinate descent algorithm alternating
 
 The regularization parameter $\lambda$ is selected by cross-validation.
 
-**ESFNNMC**
+### ESFNNMC
 
 The proposed ESFNNMC method modifies the FENNMC specification by replacing the unrestricted unit effects $u$ with $u = A\alpha$, where the columns of \(A\) are selected Moran eigenvectors derived from a spatial weights matrix.
 
@@ -60,10 +60,10 @@ Below you can also find a toy example illustrating how the method can be used to
 │   ├── FENNMC.R
 │   ├── Spatial_eigenvectors.R
 │   ├── Weight_matrix.R
-│   └── 00.R_README.md
+│   └── README.md
 ├── Data/
 │   ├── Agrimonia_stations.RData
-│   ├── 00.data_README.md
+│   ├── README.md
 │   ├── georef-italy-regione-millesime.cpg
 │   ├── georef-italy-regione-millesime.dbf
 │   ├── georef-italy-regione-millesime.prj
@@ -72,10 +72,10 @@ Below you can also find a toy example illustrating how the method can be used to
 ├── Simulation/
 │   ├── DGP_functions.R
 │   ├── Simulations.R
-│   └── 00.simulation_README.md
+│   └── README.md
 └── Application/
     ├── Application.R
-    └── 00.application_README.md
+    └── README.md
 ```
 
 The Simulation and Application directories contain the code used to reproduce the simulation study and empirical application presented in the paper.
@@ -107,7 +107,7 @@ fennmc()
 esfnnmc()
 ```
 
-which estimate the model and selects the nuclear-norm regularization parameter by cross-validation.
+which estimate the models and select the nuclear-norm regularization parameter by cross-validation.
 
 The basic usage is:
 
@@ -221,7 +221,7 @@ A_knn <- sel_knn$A
 # 3. Generate a synthetic matrix
 # --------------------------------------------------
 
-M_obs <- matrix(rnorm(n * T), nrow = n, ncol = T)
+M_obs <- matrix(rnorm(n * T, mean = 10, sd = 2), nrow = n, ncol = T)
 
 # --------------------------------------------------
 # 4. Introduce missing entries
