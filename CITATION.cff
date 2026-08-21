@@ -1,1 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated paper."
 
+title: "ESFNNMC: Eigenvector Spatial Filters Nuclear Norm Matrix Completion"
+
+authors:
+  - family-names: "Metulini"
+    given-names: "Rodolfo"
+
+type: software
+
+repository-code: "https://github.com/rodolfometulini/ESFNNMC"
+
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Metulini"
+      given-names: "Rodolfo"
+  title: "Eigenvector Spatial Filters Nuclear Norm Matrix Completion with Application to Air Quality Data"
+  year: 2026
+  journal: "arXiv preprint"
+  url: "https://arxiv.org/abs/2606.05450"
