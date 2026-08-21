@@ -78,7 +78,7 @@ Below you can also find a toy example illustrating how the method can be used to
     └── 00.application_README.md
 ```
 
-The repository will be progressively updated with the code required to reproduce the simulation study and the empirical application presented in the paper.
+The Simulation and Application directories contain the code used to reproduce the simulation study and empirical application presented in the paper.
 
 # ESFNNMC and FENNMC in R
 
@@ -95,7 +95,7 @@ Load the functions using (in this order):
 
 ```r
 source("R/FENNMC.R")
-source("R/FENNMC.R")
+source("R/ESFNNMC.R")
 source("R/Weight_matrix.R")
 source("R/Spatial_eigenvectors.R")
 ```
@@ -188,7 +188,7 @@ The following example generates a simple synthetic matrix, randomly removes 10% 
 
 ```r
 source("R/FENNMC.R")
-source("R/FENNMC.R")
+source("R/ESFNNMC.R")
 source("R/Weight_matrix.R")
 source("R/Spatial_eigenvectors.R")
 
@@ -283,16 +283,16 @@ fit_ESFNNMC <- esfnnmc(
 # --------------------------------------------------
 
 M_hat_FENNMC <- compute_matrix(
-  fit$L,
-  fit$u,
-  fit$v
+  fit_FENNMC$L,
+  fit_FENNMC$u,
+  fit_FENNMC$v
 )
 
 M_hat_ESFNNMC <- compute_matrix_with_A(
-  fit$L,
-  A,
-  fit$alpha,
-  fit$v
+  fit_ESFNNMC$L,
+  A_knn,
+  fit_ESFNNMC$alpha,
+  fit_ESFNNMC$v
 )
 
 
@@ -392,6 +392,20 @@ M = M,
     )
 ``` 
 
+## Requirements
+
+The code was developed in R (version 4.5.1). Required R packages include:
+
+- `dplyr`
+- `tidyr`
+- `tibble`
+- `sp`
+- `mapview`
+- `sf`
+- `ggplot2`
+- `spdep`
+
+Install the required packages before running the application.
 
 # Citation
 
@@ -407,7 +421,7 @@ Citation information will be updated after publication.
 
 # License
 
-ARXiv CC BY 4.0
+This software is released under the MIT License.
 
 # References
 
