@@ -1,5 +1,5 @@
 # Set your directory
-setwd("G:/Il mio Drive/00. PRIN_PNRR_2022/02. Analisi/Spatial matrix completion/GITHUB")
+#setwd("")
 
 # source files
 source("R/FENNMC.R")
