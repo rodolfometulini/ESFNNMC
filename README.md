@@ -116,6 +116,26 @@ esfnnmc()
 
 which estimate the models and select the nuclear-norm regularization parameter by cross-validation.
 
+### Relation to the MCPanel implementation
+
+The `fennmc()` function is a pure-R adaptation of the `mcnnm_cv()` function
+from the [MCPanel package](https://github.com/susanathey/MCPanel), 
+that relies on compiled C++/Eigen code. 
+`fennmc()` and `mcnnm_cv()` are equivalent at the estimator level, 
+but they are not expected to return numerically identical results
+unless the cross-validation folds and computational settings are aligned.
+
+In particular:
+
+- `fennmc()` uses different default values for the number of candidate
+  regularization parameters, the training fraction, and the maximum number
+  of iterations;
+- cross-validation folds in `fennmc()` are generated using R's random-number
+  generator and can therefore be controlled using `set.seed()`;
+- user-specified convergence settings are also used during fold initialization in `fennmc()`;
+
+### Usage
+
 The basic usage is:
 
 ```r
