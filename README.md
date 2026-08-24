@@ -56,6 +56,9 @@ Below you can also find a toy example illustrating how the method can be used to
 .
 ├── README.md
 ├── CITATION.cff
+├── Install_dependencies.R
+├── LICENSE
+├── SessionInfo.txt
 ├── R/
 │   ├── README.md
 │   ├── ESFNNMC.R
