@@ -396,20 +396,24 @@ M = M,
     )
 ``` 
 
-## Requirements
+## Installation
 
-The code was developed in R (version 4.5.1). Required R packages include:
+The repository requires R and the following packages:
 
 - `dplyr`
 - `tidyr`
 - `tibble`
 - `sp`
-- `mapview`
 - `sf`
+- `mapview`
 - `ggplot2`
 - `spdep`
 
-Install the required packages before running the application.
+Missing dependencies can be installed by running:
+
+```r
+source("install_dependencies.R")
+```
 
 # Citation
 
@@ -425,7 +429,7 @@ Citation information will be updated after publication.
 
 # License
 
-This software is released under the MIT License (LICENSE).
+This software is released under the MIT License.
 
 # References
 
