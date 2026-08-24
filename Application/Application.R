@@ -242,19 +242,18 @@ ggplot(data, aes(x = Date)) +
     aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf),
     fill = "lightblue", alpha = 0.4, inherit.aes = FALSE
   ) +
-  geom_line(
-    aes(y = mhat_fe_dalmine, color = "FENNMC"),
-    linewidth = 0.5,
-    linetype = "solid"
-  ) +
-  geom_line(
-    aes(y = mhat_esf_dalmine, color = "ESFNNMC"),
-    linewidth = 0.5,
-    linetype = "solid"
-  ) +
+geom_line(
+  aes(y = mhat_fe_dalmine, color = "FENNMC"),
+  linewidth = 1,
+  alpha = 0.7
+) +
+geom_line(
+  aes(y = mhat_esf_dalmine, color = "ESFNNMC"),
+  linewidth = 0.4
+) +
   geom_line(
     aes(y = true, color = "True"),
-    linewidth = 0.5,
+    linewidth = 0.4,
     linetype = "dashed"
   ) +
   scale_color_manual(
