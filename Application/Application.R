@@ -2,14 +2,6 @@
 #setwd("")
 
 # packages
-install.packages("dplyr")
-install.packages("tidyr")
-install.packages("tibble")
-install.packages("sp")
-install.packages("sf")
-install.packages("mapview")
-install.packages("ggplot2")
-install.packages("spdep")
 library(dplyr)
 library(tidyr)
 library(tibble)
@@ -18,7 +10,6 @@ library(mapview)
 library(sf)
 library(ggplot2)
 library(spdep)
-
 
 ### load the dataset
 load("Data/Agrimonia_stations.RData")
@@ -29,6 +20,8 @@ source("R/ESFNNMC.R")
 source("R/Weight_matrix.R")
 source("R/Spatial_eigenvectors.R")
 
+### load dependencies
+source("install_dependencies.R")
 
 # check data
 head(a)
@@ -431,6 +424,12 @@ names(contrib) <- c("Low-rank", "Unit", "Time")
 # relative contributions in FEFNNMC
 print(contrib)
 
+
+# print session info
+writeLines(
+  capture.output(sessionInfo()),
+  "sessionInfo.txt"
+)
 
 
 
