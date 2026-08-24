@@ -3,8 +3,10 @@
 This codes allows to perform fixed-effects nuclear-norm matrix completion via Soft-Impute algorithm, as described in Athey et al. (2021), 
 and the new eigenvector spatial filters nuclear-norm matrix completion. 
 
-Athey et al. codes in the R package MCPanel (https://github.com/susanathey/MCPanel) are translated from C++ to R, 
-and modified by replacing unit fixed effects with a set of eigenvectors spatial filters.
+The `FENNMC.R` implementation translates the fixed-effects nuclear-norm 
+matrix completion procedure of Athey et al. (2021) from C++ to R. 
+Building on this benchmark, `ESFNNMC.R` replaces unrestricted unit fixed effects with
+a structured spatial component represented by eigenvector spatial filters.
 
 Files included in the `R/` folder:
 
